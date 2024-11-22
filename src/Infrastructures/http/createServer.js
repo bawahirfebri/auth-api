@@ -1,14 +1,12 @@
 const Hapi = require('@hapi/hapi');
-const config = require('../../Commons/config');
 const users = require('../../Interfaces/http/api/users');
 const DomainErrorTranslator = require('../../Commons/exceptions/DomainErrorTranslator');
 const ClientError = require('../../Commons/exceptions/ClientError');
 
 const createServer = async (container) => {
   const server = Hapi.server({
-    host: config.app.host,
-    port: config.app.port,
-    debug: config.app.debug
+    host: process.env.HOST,
+    port: process.env.PORT,
   });
 
   await server.register([
@@ -17,6 +15,14 @@ const createServer = async (container) => {
       options: {container},
     },
   ]);
+
+  server.route({
+    method: 'GET',
+    path: '/',
+    handler: () => ({
+      value: 'Hello World!'
+    })
+  })
 
   server.ext('onPreResponse', (request, h) => {
     const { response } = request;
